@@ -1,10 +1,12 @@
+# To server
 import uvicorn
-
+# To create the api
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from typing import Optional
+
 
 import cv2
 import face_recognition
