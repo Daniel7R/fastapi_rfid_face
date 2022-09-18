@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from typing import Optional
 
-import cv2
+# import cv2
 import face_recognition
 
 import psycopg2 as conn
