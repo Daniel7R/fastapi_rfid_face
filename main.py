@@ -49,7 +49,7 @@ db = []
 def get_data():
     global db
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
-                       user=os.environ["USER"], password=os.environ["PASSWORD"], port=os.environ["PORT"])
+                       user=os.environ["USER"], password=os.environ["PASSWORD"], port=os.environ["PORT_DB"])
     # Driver para la conexión a la base de datos
     cursor = con.cursor()
 
@@ -88,7 +88,7 @@ def get_data():
 def set_in_time(id):
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
                        user=os.environ["USER"], password=os.environ["PASSWORD"],
-                       port=os.environ["PORT"])
+                       port=os.environ["PORT_DB"])
 
     cursor = con.cursor()
     sql = "UPDATE usuarios SET in_time=%s, out_time = '2000/01/01 00:00:00' WHERE rfid=%s"
@@ -120,7 +120,7 @@ def setHoursAccumulatorBetweenIn2Out(in_date, out_date) -> float:
 def set_out_time(id):
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
                        user=os.environ["USER"], password=os.environ["PASSWORD"],
-                       port=os.environ["PORT"])
+                       port=os.environ["PORT_DB"])
 
     cursor = con.cursor()
     sql = "SELECT in_time from usuarios WHERE rfid='%s'" % (id)
@@ -181,7 +181,7 @@ def register(
 ):
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
                        user=os.environ["USER"], password=os.environ["PASSWORD"],
-                       port=os.environ["PORT"])
+                       port=os.environ["PORT_DB"])
 
     cursor = con.cursor()
     sql = "INSERT INTO usuarios VALUES(%s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
@@ -425,4 +425,4 @@ def logoutRfId(rfid: Optional[str]):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, rel_DBoad=True)
