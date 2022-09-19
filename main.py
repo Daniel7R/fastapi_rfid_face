@@ -174,10 +174,10 @@ def home():
 
 @app.get(path="/register", summary="Register a user", tags=["Register"])
 def register(
-    id: Optional[str], name: Optional[str],
-    edad: Optional[int], genero: Optional[str],
-    estrato: Optional[int], departamento: Optional[str],
-    rfid: Optional[str]
+    id: str, name: str,
+    edad: str, genero: str,
+    estrato: str, departamento: str,
+    rfid: str
 ):
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
                        user=os.environ["USER"], password=os.environ["PASSWORD"],
@@ -221,7 +221,7 @@ def register(
     for i in face_encodings:
         encoding += str(i) + ","
 
-    aux = [id, name, edad, genero, estrato, departamento, rfid,
+    aux = [id, name, int(edad), genero, int(estrato), departamento, rfid,
            in_time, out_time, accumulator, encoding]
     value = tuple(aux)
     cursor.execute(sql, value)
@@ -233,7 +233,7 @@ def register(
 
 
 @app.get(path="/login-with-rfid", summary="Login with RfId", tags=["Login"])
-def loginRfId(rfid: Optional[str] = None):
+def loginRfId(rfid: str):
     get_data()
     global db
 
@@ -304,7 +304,6 @@ def loginFace():
                 face_distances = face_recognition.face_distance(
                     known_face_encodings, face_encoding)
                 best_match_index = np.argmin(face_distances)
-                print(face_distances)
 
                 if matches[best_match_index]:
                     name = known_face_names[best_match_index]
@@ -392,7 +391,8 @@ def logoutFace():
 
 
 @app.get(path="/logout-with-rfid", summary="Logout with RfId", tags=["Logout"])
-def logoutRfId(rfid: Optional[str]):
+def logoutRfId(rfid: str):
+    print(rfid)
     get_data()
     global db
 
@@ -407,7 +407,7 @@ def logoutRfId(rfid: Optional[str]):
             set_out_time(rfid)
 
             idx = -1
-            for i in range(known_rfids):
+            for i in range(len(known_rfids)):
 
                 if known_rfids[i] == rfid:
                     idx = i
@@ -420,8 +420,8 @@ def logoutRfId(rfid: Optional[str]):
                 status = "error"
         except:
             return JSONResponse({"status": "error"})
-
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
+
 
 
 if __name__ == "__main__":
