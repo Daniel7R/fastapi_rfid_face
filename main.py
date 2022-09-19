@@ -269,6 +269,7 @@ def loginFace():
 
     if db == []:
         msg = "You are unknown, first register yourself"
+        status = "Error"
     else:
         # Obtengo los datos de la db
         known_face_encodings = [i[-1] for i in db]
@@ -332,53 +333,58 @@ def logoutFace():
     get_data()
     global db
 
-    # Obtengo los datos de la db
-    known_face_encodings = [i[-1] for i in db]
-    known_rfids = [i[6] for i in db]
-    known_face_names = [i[1] for i in db]
-    face_locations = []
-    face_encodings = []
-    face_names = []
-
-    img_capture = cv2.VideoCapture(0)
-    ret, frame = img_capture.read()
-
-    # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-    # Se llevan todas las imagenes a un solo canal de color, red
-    rgb_small_frame = small_frame[:, :, ::-1]
-    face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(
-        rgb_small_frame, face_locations)
-
-    if face_encodings == []:
-        msg = "You are unknown, first regiter yourself"
-        status = "You are unknown"
+    if db == []:
+        msg = "You are unknown, first register yourself"
+        status = "Error"
     else:
-        for face_encoding in face_encodings:
-            # Comparo las caras
-            matches = face_recognition.compare_faces(
-                known_face_encodings, face_encoding, tolerance=0.55)
-            name = "Unknown"
-            # Hallo distancia de las caras, se usa ecuación distancia-punto
-            face_distances = face_recognition.face_distance(
-                known_face_encodings, face_encoding)
-            best_match_index = np.argmin(face_distances)
 
-            if matches[best_match_index]:
-                name = known_face_names[best_match_index]
-                set_out_time(known_rfids[best_match_index])
+        # Obtengo los datos de la db
+        known_face_encodings = [i[-1] for i in db]
+        known_rfids = [i[6] for i in db]
+        known_face_names = [i[1] for i in db]
+        face_locations = []
+        face_encodings = []
+        face_names = []
 
-            if name != "Unknown":
-                msg = name
-                status = "ok"
-            else:
-                msg = "You are unknown, first register yourself"
-                status = "You are unknown"
-                face_names.append(name)
+        img_capture = cv2.VideoCapture(0)
+        ret, frame = img_capture.read()
 
-            rand_no = np.random.random_sample()
-            cv2.imwrite(unknown_path+str(rand_no)+".jpg", frame)
+        # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
+        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+        # Se llevan todas las imagenes a un solo canal de color, red
+        rgb_small_frame = small_frame[:, :, ::-1]
+        face_locations = face_recognition.face_locations(rgb_small_frame)
+        face_encodings = face_recognition.face_encodings(
+            rgb_small_frame, face_locations)
+
+        if face_encodings == []:
+            msg = "You are unknown, first regiter yourself"
+            status = "You are unknown"
+        else:
+            for face_encoding in face_encodings:
+                # Comparo las caras
+                matches = face_recognition.compare_faces(
+                    known_face_encodings, face_encoding, tolerance=0.55)
+                name = "Unknown"
+                # Hallo distancia de las caras, se usa ecuación distancia-punto
+                face_distances = face_recognition.face_distance(
+                    known_face_encodings, face_encoding)
+                best_match_index = np.argmin(face_distances)
+
+                if matches[best_match_index]:
+                    name = known_face_names[best_match_index]
+                    set_out_time(known_rfids[best_match_index])
+
+                if name != "Unknown":
+                    msg = name
+                    status = "ok"
+                else:
+                    msg = "You are unknown, first register yourself"
+                    status = "You are unknown"
+                    face_names.append(name)
+
+                rand_no = np.random.random_sample()
+                cv2.imwrite(unknown_path+str(rand_no)+".jpg", frame)
 
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
 
