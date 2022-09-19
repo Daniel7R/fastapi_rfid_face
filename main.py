@@ -263,7 +263,7 @@ def loginRfId(rfid: Optional[str] = None):
 
 
 @app.get(path="/login-with-face", summary="Login user with face", tags=["Login"])
-def loginFace(a):
+def loginFace():
     get_data()
     global db
 
