@@ -189,12 +189,13 @@ def register(
     out_time = "2000/01/01 00:00:00"
     accumulator = 0
     accumulator = float(accumulator)
-    video_capture = cv2.VideoCapture(-1)
+    video_capture = cv2.VideoCapture(0)
 
     ret, frame = video_capture.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.24, fy=0.25)
+    # small_frame = cv2.resize(frame, (0, 0), fx=0.24, fy=0.25)
 
-    rgb_small_frame = small_frame[:, :, ::-1]
+    # rgb_small_frame = small_frame[:, :, ::-1]
+    rgb_small_frame = frame[:, :, ::-1]
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(
         rgb_small_frame, face_locations)
@@ -278,9 +279,10 @@ def loginFace():
         ret, frame = img_capture.read()
 
         # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+        # small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
         # Se llevan todas las imagenes a un solo canal de color, red
-        rgb_small_frame = small_frame[:, :, ::-1]
+        # rgb_small_frame = small_frame[:, :, ::-1]
+        rgb_small_frame = frame[:, :, ::-1]
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(
             rgb_small_frame, face_locations)
@@ -344,9 +346,10 @@ def logoutFace():
         ret, frame = img_capture.read()
 
         # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+        # small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
         # Se llevan todas las imagenes a un solo canal de color, red
-        rgb_small_frame = small_frame[:, :, ::-1]
+        # rgb_small_frame = small_frame[:, :, ::-1]
+        rgb_small_frame = frame[:, :, ::-1]
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(
             rgb_small_frame, face_locations)
