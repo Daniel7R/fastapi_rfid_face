@@ -5,9 +5,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from typing import Optional
-
-
 import cv2
 import face_recognition
 
@@ -24,17 +21,15 @@ load_dotenv()
 app = FastAPI()
 
 origins = [
-    "*",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
         "https://sa-challenge-1-fjr9ylkm3-daniel7r.vercel.app/",
         "https://sa-challenge-1-git-main-daniel7r.vercel.app",
         "https://sa-challenge-1-daniel7r.vercel.app",
         "https://software-architecture-challenge-1.vercel.app"
-    ],
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
