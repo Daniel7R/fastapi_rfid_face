@@ -189,7 +189,7 @@ def register(
     out_time = "2000/01/01 00:00:00"
     accumulator = 0
     accumulator = float(accumulator)
-    video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(-1)
 
     ret, frame = video_capture.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.24, fy=0.25)
