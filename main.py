@@ -20,18 +20,13 @@ from datetime import datetime
 load_dotenv()
 app = FastAPI()
 
-origins = [
-        "https://sa-challenge-1-fjr9ylkm3-daniel7r.vercel.app/",
-        "https://sa-challenge-1-git-main-daniel7r.vercel.app",
-        "https://sa-challenge-1-daniel7r.vercel.app",
-        "https://software-architecture-challenge-1.vercel.app"
-    ]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins= origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
 
