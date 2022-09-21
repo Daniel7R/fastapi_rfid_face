@@ -242,21 +242,24 @@ def loginRfId(rfid: str):
         # rfid = request.args.get("rfid")
         set_in_time(rfid)
 
-        idx = -1
+        idx = -100
         for i in range(len(known_rfids)):
 
             if known_rfids[i] == rfid:
                 idx = i
 
-        if idx != -1:
+        if idx != -100:
             msg = known_names[idx]
             status = "ok"
         else:
             msg = "Rfid unknown"
             status = "error"
+            
+            
+            
+    print("data", msg, "status", status)
 
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
-
 
 @app.get(path="/login-with-face", summary="Login user with face", tags=["Login"])
 def loginFace():
