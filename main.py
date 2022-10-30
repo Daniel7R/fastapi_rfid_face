@@ -1,9 +1,15 @@
 # To server
+import base64
+import io
 import uvicorn
 # To create the api
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
+from pydantic import BaseModel
+
+from PIL import Image
 
 import cv2
 import face_recognition
@@ -24,7 +30,7 @@ origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins= origins,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,6 +45,27 @@ unknown_path = "./Images/Unknown Faces/"
 date_format_str = '%Y-%m-%d %H:%M:%S.%f%z'
 
 db = []
+
+# Models for the post requests (they are required for post request, to allow send body from the frontend)
+
+
+class RequestImage(BaseModel):
+    imagen: str
+
+
+class RfIdRequest(BaseModel):
+    rfId: str
+
+
+class RegisterRequest(BaseModel):
+    id: str
+    name: str
+    edad: str
+    genero: str
+    estrato: str
+    departamento: str
+    rfId: str
+    imagen: str
 
 
 def get_data():
@@ -167,12 +194,9 @@ def home():
     return "Working!"
 
 
-@app.get(path="/register", summary="Register a user", tags=["Register"])
+@app.post(path="/register", summary="Register a user", tags=["Register"])
 def register(
-    id: str, name: str,
-    edad: str, genero: str,
-    estrato: str, departamento: str,
-    rfid: str
+    data: RegisterRequest
 ):
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
                        user=os.environ["USER"], password=os.environ["PASSWORD"],
@@ -191,8 +215,13 @@ def register(
     accumulator = float(accumulator)
     video_capture = cv2.VideoCapture(0)
 
-    ret, frame = video_capture.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.24, fy=0.25)
+    img = data.imagen[22:]
+    image = Image.open(io.BytesIO(
+        base64.decodebytes(bytes(img, "utf-8"))))
+
+    image = np.array(image)
+
+    small_frame = cv2.resize(image, (0, 0), fx=0.24, fy=0.25)
 
     rgb_small_frame = small_frame[:, :, ::-1]
     # rgb_small_frame = frame[:, :, ::-1]
@@ -201,14 +230,14 @@ def register(
         rgb_small_frame, face_locations)
 
     # To save in the folder of known persons (registered)
-    dir = known_path + name
+    dir = known_path + data.name
 
     if (not os.path.isdir(dir)):
         os.mkdir(dir)
 
     rand_no = np.random.random_sample()
     # Save and destroy camera instance
-    cv2.imwrite(dir + "/"+str(rand_no) + ".jpg", frame)
+    cv2.imwrite(dir + "/"+str(rand_no) + ".jpg", image)
     video_capture.release()
     cv2.destroyAllWindows()
 
@@ -217,7 +246,7 @@ def register(
     for i in face_encodings:
         encoding += str(i) + ","
 
-    aux = [id, name, int(edad), genero, int(estrato), departamento, rfid,
+    aux = [data.id, data.name, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
            in_time, out_time, accumulator, encoding]
     value = tuple(aux)
     cursor.execute(sql, value)
@@ -228,8 +257,8 @@ def register(
     return JSONResponse(content={"status": "Done"}, media_type="application/json")
 
 
-@app.get(path="/login-with-rfid", summary="Login with RfId", tags=["Login"])
-def loginRfId(rfid: str):
+@app.post(path="/login-with-rfid", summary="Login with RfId", tags=["Login"])
+def loginRfId(data: RfIdRequest):
     get_data()
     global db
 
@@ -240,12 +269,12 @@ def loginRfId(rfid: str):
         known_rfids = [i[6] for i in db]
         known_names = [i[1] for i in db]
         # rfid = request.args.get("rfid")
-        set_in_time(rfid)
+        set_in_time(data.rfId)
 
         idx = -100
         for i in range(len(known_rfids)):
 
-            if known_rfids[i] == rfid:
+            if known_rfids[i] == data.rfId:
                 idx = i
 
         if idx != -100:
@@ -254,18 +283,14 @@ def loginRfId(rfid: str):
         else:
             msg = "Rfid unknown"
             status = "error"
-            
-            
-            
-    print("data", msg, "status", status)
 
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
 
-@app.get(path="/login-with-face", summary="Login user with face", tags=["Login"])
-def loginFace():
+
+@app.post(path="/login-with-face", summary="Login user with face", tags=["Login"])
+async def loginFace(data: RequestImage):
     get_data()
     global db
-
     if db == []:
         msg = "You are unknown, first register yourself"
         status = "Error"
@@ -278,14 +303,17 @@ def loginFace():
         face_encodings = []
         face_names = []
 
-        img_capture = cv2.VideoCapture(0)
-        ret, frame = img_capture.read()
+        img = data.imagen[22:]
+        image = Image.open(io.BytesIO(
+            base64.decodebytes(bytes(img, "utf-8"))))
+
+        image = np.array(image)
 
         # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(image, (200, 200), fx=0.25, fy=0.25)
         # Se llevan todas las imagenes a un solo canal de color, red
         rgb_small_frame = small_frame[:, :, ::-1]
-        # rgb_small_frame = frame[:, :, ::-1]
+
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(
             rgb_small_frame, face_locations)
@@ -318,7 +346,7 @@ def loginFace():
                 face_names.append(name)
 
             rand_no = np.random.random_sample()
-            cv2.imwrite(unknown_path+str(rand_no)+".jpg", frame)
+            cv2.imwrite(unknown_path+str(rand_no)+".jpg", image)
 
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
 
@@ -327,8 +355,8 @@ def loginFace():
 # With face id
 
 
-@app.get(path="/logout-with-face", summary="Logout with face", tags=["Logout"])
-def logoutFace():
+@ app.post(path="/logout-with-face", summary="Logout with face", tags=["Logout"])
+def logoutFace(data: RequestImage):
     get_data()
     global db
 
@@ -345,11 +373,13 @@ def logoutFace():
         face_encodings = []
         face_names = []
 
-        img_capture = cv2.VideoCapture(0)
-        ret, frame = img_capture.read()
+        img = data.imagen[22:]
 
+        image = Image.open(io.BytesIO(base64.decodebytes(bytes(img, "utf-8"))))
+
+        image = np.array(image)
         # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(image, (200, 200), fx=0.25, fy=0.25)
         # Se llevan todas las imagenes a un solo canal de color, red
         rgb_small_frame = small_frame[:, :, ::-1]
         # rgb_small_frame = frame[:, :, ::-1]
@@ -384,16 +414,15 @@ def logoutFace():
                     face_names.append(name)
 
                 rand_no = np.random.random_sample()
-                cv2.imwrite(unknown_path+str(rand_no)+".jpg", frame)
+                cv2.imwrite(unknown_path+str(rand_no)+".jpg", image)
 
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
 
 # With rfid
 
 
-@app.get(path="/logout-with-rfid", summary="Logout with RfId", tags=["Logout"])
-def logoutRfId(rfid: str):
-    print(rfid)
+@ app.post(path="/logout-with-rfid", summary="Logout with RfId", tags=["Logout"])
+def logoutRfId(data: RfIdRequest):
     get_data()
     global db
 
@@ -405,12 +434,12 @@ def logoutRfId(rfid: str):
         try:
             known_rfids = [i[6] for i in db]
             known_names = [i[1] for i in db]
-            set_out_time(rfid)
+            set_out_time(data.rfId)
 
             idx = -1
             for i in range(len(known_rfids)):
 
-                if known_rfids[i] == rfid:
+                if known_rfids[i] == data.rfId:
                     idx = i
 
             if idx != -1:
@@ -422,7 +451,6 @@ def logoutRfId(rfid: str):
         except:
             return JSONResponse({"status": "error"})
     return JSONResponse(content={"data": msg, "status": status}, media_type="application/json")
-
 
 
 if __name__ == "__main__":
