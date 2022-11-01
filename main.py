@@ -203,7 +203,7 @@ def register(
                        port=os.environ["PORT_DB"])
 
     cursor = con.cursor()
-    sql = "INSERT INTO usuarios VALUES(%s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+    sql = "INSERT INTO usuarios(nombres, edad, genero, estrato, departamento, rfid, in_time, out_time, accumulator, face) VALUES(%s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
 
     # Obtengo momento actual
     now = datetime.now()
