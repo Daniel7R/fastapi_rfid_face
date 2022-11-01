@@ -237,7 +237,7 @@ def register(
     rand_no = np.random.random_sample()
     # Save and destroy camera instance
     cv2.imwrite(dir + "/"+str(rand_no) + ".jpg", image)
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
     encoding = ""
 
