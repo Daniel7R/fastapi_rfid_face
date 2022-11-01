@@ -59,7 +59,7 @@ class RfIdRequest(BaseModel):
 
 class RegisterRequest(BaseModel):
     id: str
-    name: str
+    nombre: str
     edad: str
     genero: str
     estrato: str
@@ -213,7 +213,6 @@ def register(
     out_time = "2000/01/01 00:00:00"
     accumulator = 0
     accumulator = float(accumulator)
-    video_capture = cv2.VideoCapture(0)
 
     img = data.imagen[22:]
     image = Image.open(io.BytesIO(
@@ -230,7 +229,7 @@ def register(
         rgb_small_frame, face_locations)
 
     # To save in the folder of known persons (registered)
-    dir = known_path + data.name
+    dir = known_path + data.nombre
 
     if (not os.path.isdir(dir)):
         os.mkdir(dir)
@@ -238,7 +237,6 @@ def register(
     rand_no = np.random.random_sample()
     # Save and destroy camera instance
     cv2.imwrite(dir + "/"+str(rand_no) + ".jpg", image)
-    video_capture.release()
     cv2.destroyAllWindows()
 
     encoding = ""
@@ -246,7 +244,7 @@ def register(
     for i in face_encodings:
         encoding += str(i) + ","
 
-    aux = [data.id, data.name, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
+    aux = [data.id, data.nombre, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
            in_time, out_time, accumulator, encoding]
     value = tuple(aux)
     cursor.execute(sql, value)
@@ -454,4 +452,4 @@ def logoutRfId(data: RfIdRequest):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, rel_DBoad=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
