@@ -234,7 +234,7 @@ def register(
     if (not os.path.isdir(dir)):
         os.mkdir(dir)
 
-    print(rgb_small_frame)
+    print("rgb", rgb_small_frame)
 
     rand_no = np.random.random_sample()
     # Save and destroy camera instance
