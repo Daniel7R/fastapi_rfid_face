@@ -243,7 +243,6 @@ def register(
 
     # print(face_encodings)
     for i in face_encodings:
-        print(i)
         encoding += str(i) + ","
     aux = [data.id, data.nombre, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
            in_time, out_time, accumulator, encoding]
@@ -289,7 +288,7 @@ def loginRfId(data: RfIdRequest):
 @app.post(path="/login-with-face", summary="Login user with face", tags=["Login"])
 async def loginFace(data: RequestImage):
     get_data()
-    print(data.imagen)
+    # print(data.imagen)
     global db
     if db == []:
         msg = "You are unknown, first register yourself"
