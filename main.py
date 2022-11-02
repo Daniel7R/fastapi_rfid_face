@@ -198,7 +198,7 @@ def home():
 def register(
     data: RegisterRequest
 ):
-
+    print(data)
     con = conn.connect(host=os.environ["HOST"], database=os.environ["DB"],
                        user=os.environ["USER"], password=os.environ["PASSWORD"],
                        port=os.environ["PORT_DB"])
