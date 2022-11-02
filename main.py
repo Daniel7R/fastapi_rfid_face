@@ -325,7 +325,7 @@ async def loginFace(data: RequestImage):
             for face_encoding in face_encodings:
                 # Comparo las caras
                 matches = face_recognition.compare_faces(
-                    known_face_encodings, face_encoding, tolerance=0.6)
+                    known_face_encodings, face_encoding, tolerance=0.75)
                 name = "Unknown"
                 # Hallo distancia de las caras, se usa ecuación distancia-punto
                 face_distances = face_recognition.face_distance(
