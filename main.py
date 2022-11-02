@@ -234,8 +234,6 @@ def register(
     if (not os.path.isdir(dir)):
         os.mkdir(dir)
 
-    print("rgb", rgb_small_frame)
-
     rand_no = np.random.random_sample()
     # Save and destroy camera instance
     cv2.imwrite(dir + "/"+str(rand_no) + ".jpg", image)
@@ -248,6 +246,7 @@ def register(
     aux = [data.id, data.nombre, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
            in_time, out_time, accumulator, encoding]
     value = tuple(aux)
+    print(value)
     cursor.execute(sql, value)
     con.commit()
     cursor.close()
