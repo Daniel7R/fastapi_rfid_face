@@ -220,7 +220,7 @@ def register(
 
     image = np.array(image)
 
-    small_frame = cv2.resize(image, (0, 0), fx=0.24, fy=0.25)
+    small_frame = cv2.resize(image, (200, 200), fx=0.24, fy=0.25)
 
     rgb_small_frame = small_frame[:, :, ::-1]
     # rgb_small_frame = frame[:, :, ::-1]
@@ -234,6 +234,8 @@ def register(
     if (not os.path.isdir(dir)):
         os.mkdir(dir)
 
+    print(rgb_small_frame)
+
     rand_no = np.random.random_sample()
     # Save and destroy camera instance
     cv2.imwrite(dir + "/"+str(rand_no) + ".jpg", image)
@@ -243,7 +245,6 @@ def register(
 
     for i in face_encodings:
         encoding += str(i) + ","
-    print(image)
     aux = [data.id, data.nombre, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
            in_time, out_time, accumulator, encoding]
     value = tuple(aux)
