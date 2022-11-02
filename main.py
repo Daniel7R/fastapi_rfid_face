@@ -220,7 +220,7 @@ def register(
 
     image = np.array(image)
 
-    small_frame = cv2.resize(image, (200, 200), fx=0.24, fy=0.25)
+    small_frame = cv2.resize(image, (220, 199), fx=0.24, fy=0.25)
 
     rgb_small_frame = small_frame[:, :, ::-1]
     # rgb_small_frame = frame[:, :, ::-1]
@@ -289,6 +289,7 @@ def loginRfId(data: RfIdRequest):
 @app.post(path="/login-with-face", summary="Login user with face", tags=["Login"])
 async def loginFace(data: RequestImage):
     get_data()
+    print(data.imagen)
     global db
     if db == []:
         msg = "You are unknown, first register yourself"
@@ -309,7 +310,7 @@ async def loginFace(data: RequestImage):
         image = np.array(image)
 
         # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-        small_frame = cv2.resize(image, (200, 200), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(image, (220, 199), fx=0.25, fy=0.25)
         # Se llevan todas las imagenes a un solo canal de color, red
         rgb_small_frame = small_frame[:, :, ::-1]
 
@@ -378,7 +379,7 @@ def logoutFace(data: RequestImage):
 
         image = np.array(image)
         # Se reajusta la foto en una de menor tamaño para que sea mucho mas facil procesarla
-        small_frame = cv2.resize(image, (200, 200), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(image, (220, 199), fx=0.25, fy=0.25)
         # Se llevan todas las imagenes a un solo canal de color, red
         rgb_small_frame = small_frame[:, :, ::-1]
         # rgb_small_frame = frame[:, :, ::-1]
