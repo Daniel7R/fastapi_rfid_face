@@ -227,7 +227,6 @@ def register(
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(
         rgb_small_frame, face_locations)
-    print(face_encodings)
 
     # To save in the folder of known persons (registered)
     dir = known_path + data.nombre
@@ -242,7 +241,9 @@ def register(
 
     encoding = ""
 
+    # print(face_encodings)
     for i in face_encodings:
+        print(i)
         encoding += str(i) + ","
     aux = [data.id, data.nombre, int(data.edad), data.genero, int(data.estrato), data.departamento, data.rfId,
            in_time, out_time, accumulator, encoding]
