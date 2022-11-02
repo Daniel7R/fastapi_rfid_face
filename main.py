@@ -271,7 +271,6 @@ def loginRfId(data: RfIdRequest):
 
         idx = -100
         for i in range(len(known_rfids)):
-
             if known_rfids[i] == data.rfId:
                 idx = i
 
