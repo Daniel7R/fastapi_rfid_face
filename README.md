@@ -1,6 +1,6 @@
 # Software Architecture - Challenge 2
 
-This is built with Flask, Open-cv, Face-Recognition and PostgreSQL.
+This is built with FastAPI, Open-cv, Face-Recognition and PostgreSQL.
 
 - At the first, Flask is used to create the api for the users requests
 - Open Cv is used to access to the camera and take the photos to save in the db or log into the app with face-recognition
